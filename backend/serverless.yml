@@ -4,7 +4,7 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
-  
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -89,7 +89,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: $(file(src/models/create-todo-request.json))
+              'application/json': ${file(src/models/create-todo-request.json)}
     iamRoleStatementsName: create-todo-role-function
     iamRoleStatements:
       - Effect: Allow
@@ -123,7 +123,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(src/models/update-todo-request.json)}
+              'application/json': ${file(src/models/update-todo-request.json)}
     iamRoleStatementsName: update-todo-role-function
     iamRoleStatements:
       - Effect: Allow
