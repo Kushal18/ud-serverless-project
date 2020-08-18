@@ -5,8 +5,11 @@ import { TodoUpdate } from '../../models/TodoUpdate'
 import { createLogger } from '../../utils/logger'
 import { getTodoById } from '../../businessLogic/todo'
 import { getUserId } from '../utils'
+import * as AWSXRay from 'aws-xray-sdk'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+const XAWS = AWSXRay.captureAWS(AWS)
+
+const docClient = new XAWS.DynamoDB.DocumentClient()
 
 const todosTable = process.env.TODOS_TABLE
 const logger = createLogger('auth')

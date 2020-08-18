@@ -4,7 +4,7 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
-
+  
 provider:
   name: aws
   runtime: nodejs12.x
@@ -32,6 +32,17 @@ provider:
         - dynamodb:GetItem
       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
   
+  tracing:
+    lamda: true
+    apiGateway: true
+    iamRoleStatements:
+      - Effect: 'Allow' # xray permissions (required)
+        Action:
+          - 'xray:PutTraceSegments'
+          - 'xray:PutTelemetryRecords'
+        Resource:
+          - '*'
+
 functions:
 
   Auth:
@@ -60,6 +71,12 @@ functions:
             - dynamodb:Scan 
             - dynamodb:GetItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.USER_ID_INDEX}
+      - Effect: Allow # xray permissions (required)
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - "*"
 
   # TODO: Configure this function
   CreateTodo:
@@ -70,9 +87,9 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Create a new group
-            description: Create a new group
+          request:
+            schema:
+              application/json: $(file(src/models/create-todo-request.json))
     iamRoleStatementsName: create-todo-role-function
     iamRoleStatements:
       - Effect: Allow
@@ -88,6 +105,12 @@ functions:
           - logs:CreateLogGroup
           - logs:PutLogEvents
         Resource: '*'
+      - Effect: Allow # xray permissions (required)
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - "*"
         
   # TODO: Configure this function
   UpdateTodo:
@@ -98,9 +121,9 @@ functions:
           path: todos/{todoId}
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Update a todo item
-            description: Update a todo item
+          request:
+            schema:
+              application/json: ${file(src/models/update-todo-request.json)}
     iamRoleStatementsName: update-todo-role-function
     iamRoleStatements:
       - Effect: Allow
@@ -153,6 +176,13 @@ functions:
           - s3:PutObject
           - s3:GetObject
         Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: "Allow"
         Action:
           - xray:PutTelemetryRecords

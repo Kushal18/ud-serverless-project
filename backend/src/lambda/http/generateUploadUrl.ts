@@ -31,12 +31,12 @@ function getUploadUrl(imageId: string): string {
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 try {
     const todoId = event.pathParameters.todoId
-  logger.info('Generate upload url', event);
-  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-  const authorization = event.headers.Authorization;
-  const split = authorization.split(' ');
-  const jwtToken = split[1];
-  const userId = parseUserId(jwtToken);
+    logger.info('Generate upload url', event);
+    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+    const authorization = event.headers.Authorization;
+    const split = authorization.split(' ');
+    const jwtToken = split[1];
+    const userId = parseUserId(jwtToken);
 
     const imageId = uuid.v4();
     logger.info(`upload Todo ${todoId} url for user ${userId}`);
@@ -57,7 +57,7 @@ try {
             uploadUrl,
         }),
     };
-} catch (error) {
+    } catch (error) {
     return {
         statusCode: 500,
         headers: {

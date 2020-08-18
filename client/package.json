@@ -15,6 +15,7 @@
     "styled-components": "^4.3.2"
   },
   "devDependencies": {
+    "aws-xray-sdk":"^2.2.0",
     "@types/axios": "^0.14.0",
     "@types/dateformat": "^3.0.0",
     "@types/jest": "24.0.11",
