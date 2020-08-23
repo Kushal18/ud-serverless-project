@@ -5,11 +5,16 @@ import { TodoAccess } from '../dataLayer/todosAccess'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { getUserId } from '../lambda/utils'
 import { APIGatewayProxyEvent } from 'aws-lambda'
+import { TodoUpdate } from '../models/TodoUpdate'
 
 const todoAccess = new TodoAccess()
 
 export async function getTodoById(todoId: String) {
   return todoAccess.getTodoById(todoId);
+}
+
+export async function updateTodofn(updateTodo: TodoUpdate,todoId: String) {
+  return todoAccess.updateTodo(updateTodo,todoId);
 }
 
 export async function getTodosForUser(

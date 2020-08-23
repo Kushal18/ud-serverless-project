@@ -1,17 +1,10 @@
 import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
 import 'source-map-support/register'
 import { TodoUpdate } from '../../models/TodoUpdate'
 import { createLogger } from '../../utils/logger'
-import { getTodoById } from '../../businessLogic/todo'
+import { getTodoById,updateTodofn } from '../../businessLogic/todo'
 import { getUserId } from '../utils'
-import * as AWSXRay from 'aws-xray-sdk'
 
-const XAWS = AWSXRay.captureAWS(AWS)
-
-const docClient = new XAWS.DynamoDB.DocumentClient()
-
-const todosTable = process.env.TODOS_TABLE
 const logger = createLogger('auth')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -52,23 +45,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         }
     }
     
-    await docClient.update({
-        TableName: todosTable,
-            Key: {
-                todoId: todoId
-            },
-            UpdateExpression: 'set #namefield = :n, dueDate = :d, done = :done',
-            ExpressionAttributeValues: {
-                ':n': updateTodo.name,
-                ':d': updateTodo.dueDate,
-                ':done': updateTodo.done
-            },
-            ExpressionAttributeNames: {
-                "#namefield": "name"
-            }
-    }).promise()
+    await updateTodofn(updateTodo,todoId);
     
-
     return {
         statusCode: 200,
         headers: {
